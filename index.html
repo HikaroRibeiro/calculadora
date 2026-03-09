@@ -144,14 +144,55 @@
                 )
             }
 
+
+
             function Calculator() {
+            
+            const [operation, setOperation] = React.useState('')
+            const [result, setResult] = React.useState('')
+
+            function HandleButtonClick(input) {
+                if(input === 'C') {
+                    setOperation('')
+                    setResult('')
+                    return;
+                }
+                
+                if(input === 'CE') {
+                    const operationParts = operation.slice(0, -2)
+                    setOperation(operationParts)
+                    return;
+                }
+
+                if(input === '=') {
+                    const operationResult = eval(operation.replace(/,/g, '.'))
+                    const parsedResult = operationResult.toString().replace(/\./g, ',')
+                    setResult(parsedResult)
+                    return;
+                }
+
+                if(result){
+                    setOperation(isNaN(input) ? `${result}${input}` : input)
+                    setResult('')
+                    return;
+                }
+
+                if(input === ',' && !operation.endsWith(',')) {
+                    setOperation(`${operation},`)
+                    return;
+                }
+
+                setOperation(`${operation}${input}`)
+
+            }
+
                 return (
                     <Card className={`
                         flex flex-col gap-[1.625rem] w-[22.5rem]
                         pt-14 px-8 pb-8
                         
                         `}> 
-                        <CalculatorDisplay operation="1 + 2" result="3" />
+                        <CalculatorDisplay operation={operation} result={result} />
                         <div className="flex flex-col gap-3">
                             {buttons.map((row, index) => (
                                 <div key={`row-${index}`} className="flex gap-3">
@@ -159,7 +200,10 @@
                                     <Button 
                                         key={button.input} 
                                         className={button.className ||"w-16 h-16"}
-                                        variant={button.variant}>{button.input}
+                                        variant={button.variant}
+                                        onClick={() => HandleButtonClick(button.input)}>
+                                        {button.input}
+                                        
                                     </Button>       
                                 ))}
                                 </div>
@@ -169,7 +213,7 @@
                 )
             }
 
-            function OpertionHistory() {
+            function OperationHistory() {
                 return (
                     <Card className="py-10 px-8 w-full">
                         <Text as="h1" variant="heading" className="mb-4">Histórico de Operações</Text>
@@ -190,7 +234,7 @@
                             items-center sm:items-stretch
                             gap-2`}>
                             <Calculator />
-                            <OpertionHistory />
+                            <OperationHistory />
                         </main>
                     )
             }
